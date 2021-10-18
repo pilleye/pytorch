@@ -487,6 +487,10 @@ class TORCH_API ProcessedNode {
   }
 
  private:
+  bool verify_outputs_dont_overlap_each_other() const;
+
+  bool verify_inputs_dont_overlap_outputs() const;
+
   Node* node_;
   enum class FunctionKind {
     kOutVariant,

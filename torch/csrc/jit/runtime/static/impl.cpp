@@ -1440,6 +1440,8 @@ std::vector<IValue> ProcessedNode::clone_inputs() const {
 }
 
 void ProcessedNode::run() {
+  DCHECK(verify_outputs_dont_overlap_each_other());
+  DCHECK(verify_inputs_dont_overlap_outputs());
 #ifndef PYTORCH_DISABLE_PER_OP_PROFILING
   bool pre_sampled = false;
   if (C10_UNLIKELY(at::shouldRunRecordFunction(&pre_sampled))) {
@@ -1473,6 +1475,11 @@ static bool checkNoMemoryOverlap(const at::Tensor& a, const at::Tensor& b) {
 }
 
 bool ProcessedNode::verify_no_memory_overlap() const {
+  return verify_outputs_dont_overlap_each_other() &&
+      verify_inputs_dont_overlap_outputs();
+}
+
+bool ProcessedNode::verify_outputs_dont_overlap_each_other() const {
   for (const auto i : c10::irange(outputs_size_)) {
     if (!outputs_[i].isTensor()) {
       continue;
@@ -1488,7 +1495,10 @@ bool ProcessedNode::verify_no_memory_overlap() const {
       }
     }
   }
+  return true;
+}
 
+bool ProcessedNode::verify_inputs_dont_overlap_outputs() const {
   auto schema = node()->maybeSchema();
   if (!schema || schema->is_mutable()) {
     return true;
