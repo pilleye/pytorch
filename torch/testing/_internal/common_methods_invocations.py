@@ -8409,7 +8409,7 @@ op_db: List[OpInfo] = [
            supports_autograd=True,
            supports_out=False,
            assert_jit_shape_analysis=True,
-           dtypesIfCPU=floating_types(),
+           dtypesIfCPU=floating_types_and(torch.bfloat16),
            dtypesIfCUDA=floating_types_and(torch.float16, torch.bfloat16),
            sample_inputs_func=sample_inputs_max_pool2d),
     OpInfo('nn.functional.linear',
